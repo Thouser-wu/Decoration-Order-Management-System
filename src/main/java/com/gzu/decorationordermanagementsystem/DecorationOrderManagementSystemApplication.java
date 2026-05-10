@@ -1,0 +1,13 @@
+package com.gzu.decorationordermanagementsystem;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DecorationOrderManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DecorationOrderManagementSystemApplication.class, args);
+    }
+
+}
