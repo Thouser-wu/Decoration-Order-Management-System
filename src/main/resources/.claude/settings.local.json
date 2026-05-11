@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Wujunze/Desktop/java代码/Decoration-Order-Management-System/frontend/**)",
+      "Bash(npm install *)"
+    ]
+  }
+}
