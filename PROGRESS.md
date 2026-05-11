@@ -1,6 +1,6 @@
 # 装修接单管理系统 - 开发进度报告
 
-## 更新日期：2025年5月11日
+## 更新日期：2026年5月11日
 
 ---
 
@@ -23,7 +23,12 @@
 | 统一返回封装 | ✅ | Result.java 统一响应格式 |
 | 全局异常处理 | ✅ | BusinessException + GlobalExceptionHandler |
 | 日志配置 | ✅ | logback-spring.xml 已配置 |
-| 数据库 | ⚠️ | 建表 SQL 存于 database/ 目录 |
+| Knife4j API文档 | ✅ | 已配置 Swagger 文档生成 |
+| 数据库建表脚本 | ✅ | database/schema.sql 已完成 |
+| 实体类（Entity） | ✅ | 10个核心实体类已完成 |
+| Mapper接口 | ✅ | 10个Mapper接口已完成 |
+| 自动填充配置 | ✅ | MyMetaObjectHandler 已配置 |
+| **登录认证模块** | ✅ | **AuthService + AuthController 已完成** |
 
 **后端目录结构：**
 ```
@@ -32,8 +37,46 @@ src/main/java/com/gzu/decoration/
 │   └── Result.java              # 统一返回结果封装
 ├── config/
 │   ├── CorsConfig.java          # 跨域配置
-│   ├── MybatisPlusConfig.java   # MyBatis-Plus配置
-│   └── WebMvcConfig.java        # Web配置
+│   ├── MybatisPlusConfig.java   # MyBatis-Plus配置（分页插件）
+│   ├── WebMvcConfig.java        # Web配置（JWT拦截器注册）
+│   ├── Knife4jConfig.java       # Swagger API文档配置
+│   ├── SecurityConfig.java      # 安全配置（BCrypt加密器）
+│   ├── DataInitializer.java     # 数据初始化（默认管理员账号）
+│   └── MyMetaObjectHandler.java # 自动填充配置
+├── controller/
+│   └── AuthController.java      # 认证控制器（登录、获取用户信息、修改密码）
+├── dto/
+│   ├── LoginDTO.java            # 登录请求 DTO
+│   └── ChangePasswordDTO.java   # 修改密码请求 DTO
+├── entity/
+│   ├── User.java                # 用户实体
+│   ├── Customer.java            # 客户实体
+│   ├── OrderMain.java           # 订单主表实体
+│   ├── Material.java            # 材料实体
+│   ├── MaterialPurchase.java    # 材料采购实体
+│   ├── OrderMaterial.java       # 订单材料消耗实体
+│   ├── LaborCost.java           # 人工成本实体
+│   ├── QuoteTemplate.java       # 报价模板实体
+│   ├── QuoteItem.java           # 报价明细实体
+│   └── PaymentRecord.java       # 收款记录实体
+├── mapper/
+│   ├── UserMapper.java          # 用户Mapper
+│   ├── CustomerMapper.java      # 客户Mapper
+│   ├── OrderMainMapper.java     # 订单Mapper
+│   ├── MaterialMapper.java      # 材料Mapper
+│   ├── MaterialPurchaseMapper.java  # 材料采购Mapper
+│   ├── OrderMaterialMapper.java     # 订单材料Mapper
+│   ├── LaborCostMapper.java         # 人工成本Mapper
+│   ├── QuoteTemplateMapper.java     # 报价模板Mapper
+│   ├── QuoteItemMapper.java         # 报价明细Mapper
+│   └── PaymentRecordMapper.java     # 收款记录Mapper
+├── service/
+│   ├── AuthService.java         # 认证服务接口
+│   └── impl/
+│       └── AuthServiceImpl.java # 认证服务实现类
+├── vo/
+│   ├── LoginVO.java             # 登录响应 VO
+│   └── UserInfoVO.java          # 用户信息 VO
 ├── exception/
 │   ├── BusinessException.java   # 业务异常
 │   └── GlobalExceptionHandler.java # 全局异常处理
@@ -42,6 +85,11 @@ src/main/java/com/gzu/decoration/
 └── util/
     └── JwtUtil.java             # JWT工具类
 ```
+
+**配置文件：**
+- `application.properties` - 应用配置（数据库、JWT、MyBatis-Plus）
+- `logback-spring.xml` - Logback日志配置（控制台+文件输出）
+- `pom.xml` - Maven依赖配置
 
 ---
 
@@ -200,15 +248,50 @@ mvn spring-boot:run
 
 ## 四、待完成工作
 
-### 4.1 后端 API 开发
-- [ ] 客户管理 CRUD 接口
-- [ ] 订单管理 CRUD 接口
-- [ ] 材料管理 CRUD 接口
-- [ ] 人工成本管理接口
-- [ ] 报价管理接口
-- [ ] 收款管理接口
-- [ ] 统计接口 (工作台数据、月度/年度利润)
-- [ ] 系统设置接口
+### 4.1 后端 API 开发（第二阶段）
+
+#### DTO/VO 数据传输对象 ✅
+- [x] LoginDTO/LoginVO - 登录请求/响应
+- [x] UserInfoVO - 用户信息响应
+- [x] ChangePasswordDTO - 修改密码请求
+- [ ] CustomerDTO/CustomerVO - 客户请求/响应
+- [ ] OrderDTO/OrderVO - 订单请求/响应
+- [ ] MaterialDTO/MaterialVO - 材料请求/响应
+- [ ] QuoteTemplateDTO - 报价模板请求
+- [ ] PaymentDTO - 收款请求
+- [ ] StatisticsVO - 统计数据响应
+
+#### Service 业务逻辑层 ⏳
+- [x] AuthService/AuthServiceImpl - 登录认证服务
+- [ ] CustomerService/CustomerServiceImpl - 客户服务
+- [ ] OrderService/OrderServiceImpl - 订单服务
+- [ ] MaterialService/MaterialServiceImpl - 材料服务
+- [ ] MaterialPurchaseService/MaterialPurchaseServiceImpl - 材料采购服务
+- [ ] OrderMaterialService/OrderMaterialServiceImpl - 订单材料服务
+- [ ] LaborCostService/LaborCostServiceImpl - 人工成本服务
+- [ ] QuoteTemplateService/QuoteTemplateServiceImpl - 报价模板服务
+- [ ] QuoteItemService/QuoteItemServiceImpl - 报价明细服务
+- [ ] PaymentService/PaymentServiceImpl - 收款服务
+- [ ] StatisticsService/StatisticsServiceImpl - 统计分析服务
+
+#### Controller 控制器层 ⏳
+- [x] AuthController - 认证接口（登录、获取用户信息、修改密码）
+- [ ] CustomerController - 客户管理接口
+- [ ] OrderController - 订单管理接口
+- [ ] MaterialController - 材料管理接口
+- [ ] MaterialPurchaseController - 材料采购接口
+- [ ] OrderMaterialController - 订单材料接口
+- [ ] LaborCostController - 人工成本接口
+- [ ] QuoteTemplateController - 报价模板接口
+- [ ] QuoteItemController - 报价明细接口
+- [ ] PaymentController - 收款管理接口
+- [ ] StatisticsController - 统计分析接口
+
+#### 工具类 ⏳
+- [ ] DateUtil.java - 日期工具类
+- [ ] ExcelUtil.java - Excel导出工具类
+- [ ] OrderNoGenerator.java - 订单号生成器
+- [x] BCryptPasswordEncoder - 密码加密工具（Spring Security）
 
 ### 4.2 前端功能完善
 - [ ] 报价管理页面开发
@@ -253,6 +336,81 @@ mvn spring-boot:run
 2. **接口规范**：遵循 RESTful 风格，统一返回格式
 3. **组件复用**：抽取通用组件 (表格、表单、弹窗)
 4. **代码规范**：ESLint + Prettier 保证代码质量
+
+---
+
+## 八、当前进度总结
+
+### 后端完成度：约 45%
+
+| 模块 | 完成度 | 说明 |
+|------|--------|------|
+| 项目配置 | 100% | ✅ 完成 |
+| 实体层（Entity） | 100% | ✅ 10个实体类完成 |
+| Mapper层 | 100% | ✅ 10个Mapper接口完成 |
+| 配置类 | 100% | ✅ 7个配置类完成 |
+| 工具类 | 50% | ⚠️ JWT完成，其他待补充 |
+| DTO/VO层 | 20% | ✅ 登录认证相关DTO/VO完成 |
+| Service层 | 10% | ✅ AuthService完成 |
+| Controller层 | 10% | ✅ AuthController完成 |
+| **总体进度** | **45%** | 🚧 基础架构+认证模块完成，业务层待开发 |
+
+### 前端完成度：约 60-65%
+
+| 模块 | 完成度 | 说明 |
+|------|--------|------|
+| 项目初始化 | 100% | ✅ 完成 |
+| UI框架集成 | 100% | ✅ 完成 |
+| 核心页面 | 70% | ✅ 8个页面完成 |
+| 占位页面 | 0% | ❌ 3个页面待开发 |
+| 详情页 | 0% | ❌ 待开发 |
+| 数据对接 | 20% | ⚠️ 等待后端API |
+| **总体进度** | **60-65%** | 🚧 基础页面完成，功能待完善 |
+
+### 下一步优先级
+
+**P0 - 高优先级（必须先完成）**
+1. [✅] 创建登录认证功能（AuthService + AuthController）
+2. [ ] 创建客户管理模块（Customer CRUD）
+3. [ ] 创建订单管理模块（Order CRUD）
+
+**P1 - 中优先级**
+4. 材料管理模块
+5. 材料采购与库存管理
+6. 订单材料消耗绑定
+
+**P2 - 低优先级**
+7. 人工成本管理
+8. 报价管理
+9. 收款管理
+10. 利润统计
+
+---
+
+## 九、快速测试
+
+### 后端启动
+```bash
+# 确保 MySQL 数据库已创建并执行建表 SQL
+cd Decoration-Order-Management-System
+mvn spring-boot:run
+# 访问 http://localhost:8080
+# API文档：http://localhost:8080/doc.html
+```
+
+**默认管理员账号：**
+- 用户名：`admin`
+- 密码：`123456`
+- 角色：`admin`
+
+> ⚠️ **重要提示**：首次启动后会自动创建默认管理员账号，请及时修改密码！
+
+### 前端启动
+```bash
+cd frontend
+npm run dev
+# 访问 http://localhost:5173
+```
 
 ---
 
